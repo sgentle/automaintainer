@@ -1,5 +1,8 @@
 {
   "rules": {},
   "voters": [],
-  "collaborators": []
+  "collaborators": [
+    "automaintainer",
+    "sgentle"
+  ]
 }
