@@ -47,7 +47,10 @@ A mini caching wrapper around fetch so we don't hit GitHub too hard.
             clearTimeout cache[url].timeout
             delete cache[url]
 
-          if ok then data else throw new Error(data.message or data)
+          if ok then data else
+            e = new Error(data.message or data)
+            e.status = result.status
+            throw e
 
 
 Mini API client. Takes an endpoint, prefixes it and does some JSON stuff.
@@ -266,7 +269,7 @@ Just loop over all the repos we have commit access to and run our individual hel
 
     updateRepo = (repo) ->
       getConfig repo
-      .catch (err) -> if err.message is 'Not Found' then initConfig repo else throw err
+      .catch (err) -> if err.status is 404 then initConfig repo else throw err
       .then (config) ->
         console.log "#{repo}: updating"
         Promise.resolve()
