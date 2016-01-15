@@ -16,4 +16,14 @@ Automaintainer automatically maintains your GitHub projects. Just add the automa
 
 Because those are the only rules that are currently supported. That means anyone with 1 successful pull request becomes a voter, and any pull request with 2 votes is merged automatically. You can vote by commenting with `:+1:` on an issue.
 
+You can also do
+
+```json
+  "accept_pull": {
+    "voteRatio": 0.666
+  }
+```
+
+To mean a 66% majority (of eligible voters). If you combine `voteRatio` and `votes`, automaintainer will accept a pull request if *either* is true.
+
 If you want to mess around with it, try the [automaintainer-test](https://github.com/sgentle/automaintainer-test) repo.
