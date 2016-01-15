@@ -126,7 +126,7 @@ Hopefully it shouldn't get updated often enough to matter in practice.
 
     getConfig = (repo) ->
       console.log "#{repo}: loading config"
-      api "https://raw.githubusercontent.com/#{repo}/automaintainer/automaintainer.json"
+      api "repos/#{repo}/contents/automaintainer.json?ref=automaintainer", headers: Accept: 'application/vnd.github.v3.raw'
       .then (data) ->
         config = JSON.parse data
         console.log "config", config
