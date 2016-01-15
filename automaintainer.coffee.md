@@ -247,17 +247,18 @@ how many merged pull requests are required to get vote access.
       console.log "#{repo}: updating voters"
       getMergedPullsByUser repo
       .then (userPulls) ->
-        voters = {}
-        voters[k] = true for k in config.voters or []
-        newvoters = []
-        for user, pulls of userPulls when pulls >= config.rules.voter.pulls
-          newvoters.push user if !voters[user]
-          voters[user] = true
+        newVoters = (user for user, pulls of userPulls when pulls >= config.rules.voter.pulls and user isnt 'automaintainer')
+        diff = arrayDiff (config.voters or []), newVoters
 
-        return if newvoters.length is 0
+        return if !diff.added.length and !diff.removed.length
 
-        config.voters = (k for k of voters).sort()
-        updateConfig repo, "New voters: #{newvoters.join ', '}", config
+        config.voters = diff.unchanged.concat(diff.added).sort()
+
+        msg = []
+        msg.push "New voters: #{diff.added.join ', '}" if diff.added.length
+        msg.push "Removed voters: #{diff.removed.join ', '}" if diff.removed.length
+
+        updateConfig repo, msg.join('; '), config
 
 
 High-level update
