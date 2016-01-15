@@ -184,14 +184,19 @@ or voter.
       canVote = {}
       canVote[k] = true for k in config.voters or []
       canVote[k] = true for k in config.collaborators or []
+      numVoters = Object.keys(canVote).length
 
-      api pull.comments_url #"repos/#{repo}/issues/#{pull.number}/comments"
+      votesNeeded = Math.min(
+        config.rules.accept_pull.votes or Infinity,
+        config.rules.accept_pull.voteRatio * numVoters or Infinity
+      )
+
+      api pull.comments_url
       .then (comments) ->
         voted = []
-        #console.log "comments", comments, canVote[comments[0].user.login], comments[0].body.match ':+1:'
         for comment in comments when canVote[comment.user.login] and comment.body.indexOf ':+1:' > -1
           voted.push comment.user.login
-          if voted.length >= config.rules.accept_pull.votes
+          if voted.length >= votesNeeded
             return acceptPull repo, pull, voted
         return
 
