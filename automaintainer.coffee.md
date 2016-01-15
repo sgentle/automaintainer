@@ -196,7 +196,7 @@ or voter.
       api pull.comments_url
       .then (comments) ->
         voted = []
-        for comment in comments when canVote[comment.user.login] and comment.body.indexOf ':+1:' > -1
+        for comment in comments when canVote[comment.user.login] and comment.body.indexOf(':+1:') > -1
           voted.push comment.user.login
           if voted.length >= votesNeeded
             return acceptPull repo, pull, voted
