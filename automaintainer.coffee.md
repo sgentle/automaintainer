@@ -144,7 +144,6 @@ Hopefully it shouldn't get updated often enough to matter in practice.
       gitAPI "refs/heads/automaintainer"
       .catch -> null
       .then (ref) ->
-        # console.log "ref", ref
         head = ref?.object?.sha
 
         gitAPI.post "trees", tree: [tree]
@@ -235,7 +234,6 @@ how many merged pull requests are required to get vote access.
     getMergedPullsByUser = (repo) ->
       api "repos/#{repo}/pulls?state=closed"
       .then (pulls) ->
-        # console.log "pulls", pulls
         users = {}
         for pull in pulls when pull.merged_at
           users[pull.user.login] ||= 0
