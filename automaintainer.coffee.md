@@ -85,6 +85,23 @@ Mini API client. Takes an endpoint, prefixes it and does some JSON stuff.
     api = makeAPI()
 
 
+Array diff: return items added, removed or unchanged
+
+    arrayDiff = (oldA, newA) ->
+      added = []
+      unchanged = []
+
+      removedMap = {}
+      oldMap = {}
+      removedMap[x] = oldMap[x] = true for x in oldA
+      for x in newA
+        delete removedMap[x]
+        (if oldMap[x] then unchanged else added).push x
+
+      removed = Object.keys removedMap
+
+      {added, removed, unchanged}
+
 Config
 ------
 
@@ -197,17 +214,18 @@ how many merged pull requests are required to get vote access.
       repoAPI = api.with "repos/#{repo}"
       repoAPI 'collaborators'
       .then (collaborators) ->
-        collabs = {}
-        collabs[k] = true for k in config.collaborators or []
-        newcollabs = []
-        for {login} in collaborators
-          newcollabs.push login if !collabs[login]
-          collabs[login] = true
+        newCollaborators = (x.login for x in collaborators when x.login isnt 'automaintainer')
+        diff = arrayDiff config.collaborators, newCollaborators
 
-        return if newcollabs.length is 0
+        return if !diff.added.length and !diff.removed.length
 
-        config.collaborators = (k for k of collabs).sort()
-        updateConfig repo, "New collaborators: #{newcollabs.join ', '}", config
+        config.collaborators = diff.unchanged.concat(diff.added).sort()
+
+        msg = []
+        msg.push "New collaborators: #{diff.added.join ', '}" if diff.added.length
+        msg.push "Removed collaborators: #{diff.removed.join ', '}" if diff.removed.length
+
+        updateConfig repo, msg.join('; '), config
 
     getMergedPullsByUser = (repo) ->
       api "repos/#{repo}/pulls?state=closed"
