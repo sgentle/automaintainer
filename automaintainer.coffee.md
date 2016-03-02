@@ -60,6 +60,7 @@ Mini API client. Takes an endpoint, prefixes it and does some JSON stuff.
         endpoint = "#{base}/#{endpoint}" unless endpoint.match /^https:/
         opts.headers ||= {}
         opts.headers[k] = v for k, v of HEADERS
+        opts.timeout = 10*1000
         cachedfetch endpoint, opts
 
       api.get = (endpoint, opts={}) ->
